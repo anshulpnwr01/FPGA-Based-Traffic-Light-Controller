@@ -42,5 +42,3 @@ Below are snapshots from the simulation environment tracking the internal regist
 ![Simulation Waveform 1](WhatsApp%20Image%202026-07-28%20at%2011.19.24%20PM.jpeg)
 ![Simulation Waveform 2](WhatsApp%20Image%202026-07-28%20at%2011.19.25%20PM%20(1).jpeg)
 
-## Documentation Details
-For a deeper dive into the system's inner workings, please open the **fpga traffic light controller with priority system_2.pdf** file in this repository.
