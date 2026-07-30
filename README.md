@@ -1,80 +1,53 @@
-# Arduino Traffic Light Controller
+# FPGA-Based Traffic Light Controller
 
-## Overview
-This project is a beginner-friendly hardware simulation of a standard intersection traffic light. Built using an Arduino UNO, the system utilizes basic digital outputs and delay timers to cycle through Green, Yellow, and Red states, accurately mimicking real-world traffic signal behavior.
+![Badges](https://img.shields.io/badge/HDL-Verilog-blue) ![Badges](https://img.shields.io/badge/Domain-VLSI-orange) ![Badges](https://img.shields.io/badge/Design-RTL-green) ![Badges](https://img.shields.io/badge/Architecture-FSM-red) ![Badges](https://img.shields.io/badge/Verification-Testbench-purple) ![Badges](https://img.shields.io/badge/Waveform-GTKWave-yellow) ![Badges](https://img.shields.io/badge/Status-Complete-brightgreen)
 
-## Circuit Diagram
-Below is the wiring diagram for the project, showing how the LEDs and resistors connect to the Arduino.
+## About
+FPGA-Based Traffic Light Controller using Verilog HDL and Finite State Machine (FSM). Features include pedestrian crossing support, emergency vehicle priority, night mode operation, waveform verification, and FPGA-ready implementation.
 
-![Circuit Diagram](WhatsApp%20Image%202026-07-28%20at%207.41.25%20PM%20(1).jpeg)
+## Repository Structure
+As shown in the repository overview, the project is organized into the following directories:
+* `rtl/`: Contains the core Verilog design files (e.g., `traffic_fsm.v`).
+* `tb/`: Contains the testbench files for simulation and verification.
+* `simulation/` & `waveforms/`: Stores simulation scripts and GTKWave waveform outputs.
+* `dashboard/`: Contains the software model for the interactive UI.
+* `docs/` & `images/`: Project documentation and reference images.
 
-### Hardware Required
-To build this project, you will need the following components:
-* **1x** Arduino UNO
-* **1x** Breadboard
-* **1x** Green LED
-* **1x** Yellow LED
-* **1x** Red LED
-* **3x** Current-limiting Resistors
-* Jumper wires
-
-### Wiring Connections
-The circuit is wired as follows:
-* **Green LED:** Anode connected to Arduino **Digital Pin 1**.
-* **Yellow LED:** Anode connected to Arduino **Digital Pin 2**.
-* **Red LED:** Anode connected to Arduino **Digital Pin 3**.
-* **Ground:** All LED cathodes route through resistors to the shared ground rail on the breadboard, which connects to the Arduino's `GND` pin.
+![GitHub Repository Overview](WhatsApp%20Image%202026-07-28%20at%2011.19.25%20PM.jpeg)
 
 ---
 
-## Code Explanation
-The logic of the traffic light is straightforward. In the `setup()` function, the three digital pins are configured as outputs. The `loop()` function then controls the sequence in three distinct phases:
+## Interactive Controller Dashboard
+The project features a software model of the traffic cabinet (operating in a 10 Hz tick domain) to visualize the intersection and interact with the controller logic without requiring physical FPGA hardware immediately.
 
-1. **Green Phase:** The Green LED is set to `HIGH` (ON), while Yellow and Red are set to `LOW` (OFF). This state holds for 5,000 milliseconds (5 seconds).
-2. **Yellow Phase:** The Yellow LED is set to `HIGH`, while Green and Red are set to `LOW`. This state serves as a transition and holds for 2,000 milliseconds (2 seconds).
-3. **Red Phase:** The Red LED is set to `HIGH`, while Green and Yellow are set to `LOW`. This state holds for 5,000 milliseconds (5 seconds) before the entire loop restarts.
+![Traffic Light Dashboard](WhatsApp%20Image%202026-07-28%20at%2011.19.24%20PM%20(1).jpeg)
 
-### Code Snippets
-Here are the references for the code structure:
+### Demand Inputs & Pre-emption
+The control logic responds dynamically to several inputs simulating real-world traffic conditions:
 
-**Setup and Green Light Logic:**
-![Code Part 1 - Setup and Green Light](WhatsApp%20Image%202026-07-28%20at%207.41.26%20PM.jpeg)
+![Controller Cabinet Inputs](WhatsApp%20Image%202026-07-28%20at%2011.19.26%20PM.jpeg)
 
-**Yellow and Red Light Logic:**
-![Code Part 2 - Yellow and Red Light](WhatsApp%20Image%202026-07-28%20at%207.41.25%20PM.jpeg)
+* **`veh_ns` (North-South loop sensor):** Detects waiting vehicles on the main axis.
+* **`veh_ew` (East-West loop sensor):** Detects waiting vehicles on the cross-axis.
+* **`ped_btn` (Pedestrian Button):** Latches a WALK request for safe crossing.
+* **`emergency` (Pre-emption):** Forces an all-red state for standard traffic, holding the priority open for emergency vehicles.
+* **`night_mode` (Pre-emption):** Switches the intersection to a low-traffic flashing amber/red state.
+* **`rst_n`:** Resets the controller state to its default parameters.
 
 ---
 
-## Full Source Code
-For convenience, you can copy the complete Arduino code (`.ino`) below to upload directly to your board:
+## Simulation and Waveform Verification
+The RTL design is fully verified using testbenches. The state changes, phase timers, and control signals (`EW_G`, `NS_R`, etc.) can be analyzed using a waveform viewer (such as GTKWave). 
 
-```cpp
-int green = 1;
-int yellow = 2;
-int red = 3;
+Below are snapshots from the simulation environment tracking the internal registers (`STATE_ID`, `prev_state`) and the corresponding output signals based on the demand inputs:
 
-void setup() {
-  pinMode(green, OUTPUT);
-  pinMode(yellow, OUTPUT);
-  pinMode(red, OUTPUT);
-}
+![Simulation Waveform 1](WhatsApp%20Image%202026-07-28%20at%2011.19.24%20PM.jpeg)
 
-void loop() {
-  // Green ON
-  digitalWrite(green, HIGH);
-  digitalWrite(yellow, LOW);
-  digitalWrite(red, LOW);
-  delay(5000);
+![Simulation Waveform 2](WhatsApp%20Image%202026-07-28%20at%2011.19.25%20PM%20(1).jpeg)
 
-  // Yellow ON
-  digitalWrite(green, LOW);
-  digitalWrite(yellow, HIGH);
-  digitalWrite(red, LOW);
-  delay(2000);
-
-  // Red ON
-  digitalWrite(green, LOW);
-  digitalWrite(yellow, LOW);
-  digitalWrite(red, HIGH);
-  delay(5000);
-}
+## Getting Started
+To simulate this project locally:
+1. Clone the repository.
+2. Navigate to the `simulation` folder.
+3. Run the provided simulation scripts (ensure you have a Verilog simulator and GTKWave installed).
+4. Launch the dashboard to interact with the FSM visually.
